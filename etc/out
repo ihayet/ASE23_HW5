@@ -1,0 +1,8 @@
+{:Far 0.95 :Sample 512 :dump false :file etc/data/repgrid1 :go all :help false :min 0.5 :p 2 :seed 937162211}
+✅ pass: the
+✅ pass: sym
+✅ pass: num
+8 TargetedOnInterface:TargetedOnOverallSystem
+| 4 CommunicationTechnology:ApplicationTechnology
+| 4 DevelopmentTool:Application
+✅ pass: synonyms
