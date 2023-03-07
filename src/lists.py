@@ -5,7 +5,9 @@ def map(t, fun):
     if isinstance(t, dict):
         temp = {}
         for k, v in t.items():
+            print(v)
             v, k = fun(v)
+            print(v, k)
             
             if k is not None: temp[k] = v
             else: temp.append(v)

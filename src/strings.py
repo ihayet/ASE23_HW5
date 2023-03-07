@@ -86,14 +86,14 @@ def coerce(s):
 
 def show(node, what=None, cols=None, nPlaces=None, lvl=None):
   o_file = get_ofile()
-  if node is not None:
-    lvl = lvl if lvl is not None else 0
+  if node:
+    lvl = lvl or 0
     
-    pval = str('| '*lvl) + str(len(node['data'].rows)) + ' ' 
+    pval = fmt("%s[%s]", str('|.. '*lvl), str(len(node['data'].rows)))
     print(pval, end='')
     o_file.write(pval)
     
-    pval = o(last(last(node['data'].rows).cells)) if ('left' not in node or lvl==0) else fmt("%.f", rnd(100*node.c))
+    pval = o(node['data'].stats()) if ('left' not in node) else ''
     print(pval)
     o_file.write(pval + '\n')
 

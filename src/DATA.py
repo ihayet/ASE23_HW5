@@ -2,7 +2,7 @@ from COLS import COLS
 from ROW import ROW
 from csv import csv
 from lists import map, kap, sort
-from utils import getThe, cosine, many, any
+from utils import getThe, rnd, cosine, many, any, last
 import math
 
 class DATA:
@@ -23,9 +23,20 @@ class DATA:
         data = DATA(None, [self.cols.names], [row.get_cells() for row in (rows if rows is not None else self.rows)])
         return data
 
-    def stats(self, what, cols, nPlaces):
-        def fun(k, col): return col.rnd(col.mid() if (what == 'mid') else col.div(), nPlaces), col.get_name()
-        return kap(self.cols.ycols if (cols is None or len(cols) == 0) else cols, fun)
+    def stats(self, _what=None, _cols=None, _nPlaces=None):
+        def fun(k, col):
+            if _nPlaces: val = rnd(col.mid() if _what=='mid' or _what==None else col.div(), _nPlaces)
+            else: val = rnd(col.mid() if _what=='mid' or _what==None else col.div())
+            return val, col.get_name()
+        
+        cols = _cols or self.cols.ycols
+
+        colsdict = {}
+        for (i, v) in enumerate(cols): colsdict[i] = v
+        tmp = kap(colsdict, fun)
+        tmp["N"] = len(self.rows)
+
+        return tmp
     
     def better(self, row1, row2):
         s1, s2, ys = 0, 0, self.cols.ycols
@@ -37,9 +48,9 @@ class DATA:
             s2 = s2 - math.exp(col.w * (y-x)/len(ys))
         return s1/len(ys) < s2/len(ys)
 
-    def dist(self, row1, row2, cols):
+    def dist(self, row1, row2, cols=None):
         n, d = 0, 0
-        for _, col in enumerate(cols if cols is not None else self.cols.xcols):
+        for _, col in enumerate(cols or self.cols.xcols):
             n += 1
             d += col.dist(row1.cells[col.get_pos()], row2.cells[col.get_pos()])**getThe()['p']
         val = (d/n)**(1/getThe()['p'])
@@ -52,34 +63,34 @@ class DATA:
             ret['dist'] = self.dist(row1, row2, self.cols.xcols)
             return ret, None
         
-        mapped_val = map(rows if rows is not None else self.rows, fun)
+        mapped_val = map(rows or self.rows, fun)
         sorted_val = sort(mapped_val, 'dist')
 
         return sorted_val
 
-    def half(self, rows, cols, above):
+    def furthest(self, row1, rows):
+        t = self.around(row1, rows)
+        return t[len(t)-1]
+
+    def half(self, rows=None, cols=None, above=None):
         A, B, c = 0, 0, 0
         left, right = [], []
+
+        def gap(r1, r2): return self.dist(r1, r2, cols)
         def project(row):
+            x, y = cosine(self.dist(row, A, cols), self.dist(row, B, cols), c)
             ret = {}
+            row.x, row.y = x, y
             ret['row'] = row
-            ret['dist'] = cosine(self.dist(row, A, cols), self.dist(row, B, cols), c)
+            ret['dist'] = x
             return ret, None
-        rows = rows if rows is not None else self.rows
-        some = many(rows, getThe()['Sample'])
         
-        A = above if above is not None else any(some)
-
-        b1 = self.around(A, some)
-        target_idx = len(rows)-1
-
-        for n, item in enumerate(b1):
-            if n==target_idx:
-                B = item['row']
-        
+        rows = rows or self.rows
+        some = many(rows, getThe()['Halves'])        
+        A = above if getThe()['Reuse'] and above else any(self.rows)
+        B = self.furthest(A, some)['row']
         c = self.dist(A, B, None)
-        mid = []
-
+        
         temp = sort(map(rows, project), 'dist')
         for n, t in enumerate(temp):
             if n < math.floor(len(rows)/2):
@@ -89,33 +100,38 @@ class DATA:
                 right.append(t['row'])
         return left, right, A, B, mid, c
 
-    def cluster(self, rows=None, min=None, cols=None, above=None):
-        rows = rows if rows is not None else self.rows
-        min = min if min is not None else len(rows)**getThe()['min']
-        cols = cols if cols is not None else self.cols.xcols
+    def cluster(self, rows=None, cols=None, above=None):
+        rows = rows or self.rows
+        cols = cols or self.cols.xcols    
+
+        # newrows = []
+        # for row in rows:
+        #     r = ROW([val for val in row.cells])
+        #     r.x, r.y = row.x, row.y
+        #     newrows.append(r)
+
         node = {
             'data': self.clone(rows)
-        }
+        }       
         
-        if len(rows) > 2*min:
-            left, right, node['A'], node['B'], node['mid'], _c = self.half(rows, cols, above)
-            node['left'] = self.cluster(left, min, cols, node['A'])
-            node['right'] = self.cluster(right, min, cols, node['B'])
+        if len(rows) >= 2 * len(self.rows) ** getThe()['min']:
+            left, right, node['A'], node['B'], node['mid'], node['c'] = self.half(rows, cols, above)
+            
+            node['left'] = self.cluster(left, cols, node['A'])
+            node['right'] = self.cluster(right, cols, node['B'])
         
         return node
 
-    def sway(self, rows, min, cols, above):
-        rows = rows if rows is not None else self.rows
-        min = min if min is not None else len(rows)**getThe()['min']
-        cols = cols if cols is not None else self.cols.xcols
-        node = {
-            'data': self.clone(rows)
-        }
-
-        if len(rows) > 2*min:
-            left, right, node['A'], node['B'], node['mid'], c = self.half(rows, cols, above)
-            if self.better(node['B'], node['A']):
-                left, right, node['A'], node['B'] = right, left, node['B'], node['A']
-            node['left'] = self.sway(left, min, cols, node['A'])
-
-        return node
+    def sway(self):
+        def worker(rows, worse, above=None):
+            if len(rows) <= len(self.rows) ** getThe()['min']:
+                return rows, many(worse, getThe()['rest'] * len(rows))
+            else:
+                left, right, A, B, _mid, _c = self.half(rows, None, above)
+                if self.better(B, A): 
+                    left, right, A, B = right, left, B, A
+                for row in right: worse.append(row)
+                return worker(left, worse, A)
+        
+        best, rest = worker(self.rows, [])
+        return self.clone(best), self.clone(rest)

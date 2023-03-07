@@ -1,6 +1,8 @@
 import re
 import os
 from DATA import DATA
+from utils import last, get_ofile
+from strings import oo, show
 
 def clean(val):
     for (src, dest) in zip(["cols=", "rows=", "_", "'", "{", "}", ","], ["", "", "", "", "", "", ""]):
@@ -73,4 +75,43 @@ def reprows(fname):
         tocsv(fname, attributes, examples)
 
         return DATA(fname+'_examples.csv')
+    
+def repplace(data):
+    n = 20
+    g = [None] * n
+    for i in range(0, n):
+        g[i] = [None] * n
+        for j in range(0, n):
+            g[i][j] = ' '
+    
+    maxy = 0
+    print('')
+    
+    allrows = data['data']
+    rowxy = {}
+    for row in data['left']['data']: rowxy[last(row.cells)] = {'x': row.x, 'y': row.y}
+    for row in data['right']['data']: rowxy[last(row.cells)] = {'x': row.x, 'y': row.y}
+
+    for r, row in enumerate(allrows):
+        c = chr(65 + r)
+        print(c, last(row.cells))
+        get_ofile().write(c + ' ' + last(row.cells) + '\n')
+        x, y = int(rowxy[last(row.cells)]['x']*n), int(rowxy[last(row.cells)]['y']*n)
+
+        maxy = max(maxy, y)
+        g[y][x] = c
+    
+    for y in range(0, maxy+1): 
+        oo(g[y])
+
+def repgrid(fname):
+    t = reprows(fname)
+    rows = t.cluster()
+    show(rows)
+
+    t = repcols(fname)
+    cols = t.cluster()
+    show(cols)
+
+    repplace(rows)
     

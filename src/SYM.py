@@ -3,7 +3,10 @@ import math
 
 class SYM(VAL):
     def __init__(self, *args):
-        if len(args) > 0: super().__init__(args[0], args[1])
+        if len(args) > 0: 
+            super().__init__(args[0], args[1])
+        elif len(args) == 0:
+            super().__init__(None, None)
         self.total, self.most, self.mode = 0, 0, None
         self.sym_counter = {}
 
@@ -20,7 +23,7 @@ class SYM(VAL):
                 self.most = self.sym_counter[x]
                 self.mode = x
 
-    def mid(self):
+    def mid(self, col=None):
         return self.mode
 
     def div(self):

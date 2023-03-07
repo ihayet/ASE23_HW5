@@ -2,12 +2,11 @@ from re import S
 from SYM import SYM
 from NUM import NUM
 from strings import o, oo, show
-from utils import getThe, rand, rnd, setSeed, get_ofile, copy
-from repgrid import repcols, reprows
+from lists import map
+from utils import getThe, setThe, cliffsDelta, diffs, rand, rint, rnd, setSeed, get_ofile, copy, last, has
+from repgrid import repcols, reprows, repplace, repgrid
 from csv import csv
 from DATA import DATA
-
-import traceback
 
 def settings_test():
     err = 0
@@ -17,22 +16,14 @@ def settings_test():
 
 def rand_test():
     err = 0
-    num1, num2 = NUM(), NUM()
-
-    setSeed(getThe()['seed'])
-    for i in range(1, 10**3):
-        num1.add(rand(0, 1))
     
-    setSeed(getThe()['seed'])
-    for i in range(1, 10**3):
-        num2.add(rand(0, 1))
+    r1, r2 = [], []
+    setSeed(1)
+    for i in range(10000): r1.append(rint(100, 0))
+    setSeed(1)
+    for i in range(10000): r2.append(rint(100, 0))
 
-    m1, m2 = rnd(num1.mid(), 10), rnd(num2.mid(), 10)
-
-    if m1 != m2:
-        err += 1
-    if rnd(m1, 1) != 0.5:
-        err += 1
+    for (i, v) in enumerate(r1): assert(v == r2[i])
 
     return err
 
@@ -41,6 +32,8 @@ def sym_test():
     for c in ["a","a","a","a","b","b","c"]:
         sym.add(c)
     
+    print(sym.mid(), rnd(sym.div()))
+
     if sym.mid() != "a":
         err += 1
     if sym.div() > (1.379 + 0.001) or sym.div() < (1.379 - 0.001):
@@ -48,15 +41,12 @@ def sym_test():
     return err
 
 def num_test():
-    err, num = 0, NUM()
-    for i in [1,1,1,1,2,2,3]:
-        num.add(i)
-
-    if num.mid() > (1.57142857 + 0.01) or num.mid() < (1.57142857 - 0.01):
-        err += 1
-    if rnd(num.div()) > (0.787 + 0.01) or rnd(num.div()) < (0.787 - 0.01):
-        err += 1
-    return err
+    num1, num2 = NUM(), NUM()
+    for i in range(1, 10001): num1.add(rand())
+    for i in range(1, 10001): num2.add(rand()**2)
+    print(1, rnd(num1.mid()), rnd(num1.div()))
+    print(2, rnd(num2.mid()), rnd(num2.div()))
+    return 0.5 == rnd(num1.mid()) and num1.mid() > num2.mid()
 
 def csv_test():
     err, n = 0, 0
@@ -71,11 +61,12 @@ def csv_test():
 
 def data_test():
     err = 0
-    data = DATA(getThe()['file'], None, None)
-    err += 1 if len(data.rows) != 398 else 0
-    err += 1 if data.cols.ycols[0].w != -1 else 0
-    err += 1 if data.cols.xcols[0].col_pos != 0 else 0
-    err += 1 if len(data.cols.xcols) != 4 else 0
+    
+    data = DATA(getThe()['file'])
+    col = data.cols.xcols[0]
+    print(col.lo, col.hi, col.mid(), col.div())
+    oo(data.stats())
+
     return err
 
 def stats_test():
@@ -93,12 +84,12 @@ def stats_test():
 
 def clone_test():
     err = 0
-    data1 = DATA(getThe()['file'], None, None)
+    
+    data1 = DATA(getThe()['file'])
     data2 = data1.clone(data1.rows)
-    err += 1 if len(data1.rows) != len(data2.rows) else 0
-    err += 1 if data1.cols.ycols[0].w != data2.cols.ycols[0].w else 0
-    err += 1 if data1.cols.xcols[0].get_pos() != data2.cols.xcols[0].get_pos() else 0
-    err += 1 if len(data1.cols.xcols) != len(data2.cols.xcols) else 0
+    oo(data1.stats())
+    oo(data2.stats())
+
     return err
 
 def around_test():
@@ -127,37 +118,35 @@ def half_test():
     data = DATA(getThe()['file'], None, None)
     left, right, A, B, mid, c = data.half(None, None, None)
     
-    pval = str(len(left)) + ' ' + str(len(right)) + ' ' + str(len(data.rows))
-    print(pval)
-    o_file.write(pval + '\n')
-    
-    pval = o(A.cells) + ' ' + str(c)
-    print(pval)
-    o_file.write(pval + '\n')
-
-    pval = o(mid.cells)
-    print(pval)
-    o_file.write(pval + '\n')
-
-    pval = o(B.cells)
-    print(pval)
-    o_file.write(pval + '\n')
+    print(len(left), len(right))
+    l, r = data.clone(left), data.clone(right)
+    print('l', o(l.stats()))
+    print('r', o(r.stats()))
 
     return err
 
-def cluster_test():
+def cluster_test():  
     err = 0
 
-    data = DATA(getThe()['file'], None, None)
-    show(data.cluster(None, None, None, None), 'mid', data.cols.ycols, 1, None)
+    data = DATA(getThe()['file'])
+    show(data.cluster(), 'mid', data.cols.ycols, 1, None)
 
     return err
 
 def optimize_test():
     err = 0
 
-    data = DATA(getThe()['file'], None, None)
-    show(data.sway(None, None, None, None), 'mid', data.cols.ycols, 1, None)
+    data = DATA(getThe()['file'])
+    best, rest = data.sway()
+
+    print('\nall\t', o(data.stats()))
+    print('   \t', o(data.stats(_what='div')))
+    print('\nbest\t', o(best.stats()))
+    print('    \t', o(best.stats(_what='div')))
+    print('\nrest\t', o(rest.stats()))
+    print('    \t', o(rest.stats(_what='div')))
+    print('\nall ~= best?', o(diffs(best.cols.ycols, data.cols.ycols)))
+    print('best ~= rest?', o(diffs(best.cols.ycols, rest.cols.ycols)))
 
     return err
 
@@ -165,8 +154,13 @@ def copy_test():
     t1 = { 'a': 1, 'b': { 'c': 2, 'd': [3] } }
     t2 = copy(t1)
     t2['b']['d'][0] = 10000
-        
-    print('b4', o(t1), '\nafter', o(t2))
+            
+    print('b4\t', end='')
+    get_ofile().write('b4\t')
+    oo(t1)
+    print('\nafter\t')
+    get_ofile().write('after\t')
+    oo(t2)
 
     return 0
 
@@ -176,12 +170,14 @@ def repcols_test():
     try:
         for col in t.cols.xcols:
             print('{' + 'a NUM' + ' :at {}'.format(col.get_pos()) + ' :hi {}'.format(col.hi) + ' :lo {}'.format(col.lo) + ' :m2 {}'.format(rnd(col.m2, 3)) + ' :mu {}'.format(rnd(col.mu), 3) + ' :n {}'.format(col.total) + ' :txt {}'.format(col.get_name()) + '}')
+            get_ofile().write('{' + 'a NUM' + ' :at {}'.format(col.get_pos()) + ' :hi {}'.format(col.hi) + ' :lo {}'.format(col.lo) + ' :m2 {}'.format(rnd(col.m2, 3)) + ' :mu {}'.format(rnd(col.mu), 3) + ' :n {}'.format(col.total) + ' :txt {}'.format(col.get_name()) + '}\n')
     except Exception:
         pass
 
     try:
         for row in t.rows:
             print('{' + 'a ROW :cells ' + str(row.cells) + '}')
+            get_ofile().write('{' + 'a ROW :cells ' + str(row.cells) + '}\n')
     except Exception:
         pass
 
@@ -193,12 +189,14 @@ def reprows_test():
     try:
         for col in t.cols.xcols:
             print('{' + 'a NUM' + ' :at {}'.format(col.get_pos()) + ' :hi {}'.format(col.hi) + ' :lo {}'.format(col.lo) + ' :m2 {}'.format(rnd(col.m2, 3)) + ' :mu {}'.format(rnd(col.mu), 3) + ' :n {}'.format(col.total) + ' :txt {}'.format(col.get_name()) + '}')
+            get_ofile().write('{' + 'a NUM' + ' :at {}'.format(col.get_pos()) + ' :hi {}'.format(col.hi) + ' :lo {}'.format(col.lo) + ' :m2 {}'.format(rnd(col.m2, 3)) + ' :mu {}'.format(rnd(col.mu), 3) + ' :n {}'.format(col.total) + ' :txt {}'.format(col.get_name()) + '}\n')
     except Exception:
         pass
 
     try:
         for row in t.rows:
             print('{' + 'a ROW :cells ' + str(row.cells) + '}')
+            get_ofile().write('{' + 'a ROW :cells ' + str(row.cells) + '}\n')
     except Exception:
         pass
 
@@ -212,4 +210,65 @@ def synonyms_test():
     return 0
 
 def prototypes_test():
-    pass
+    t = reprows(getThe()['file'])
+    clustered = t.cluster(cols=t.cols.xcols)
+    show(clustered)
+
+    return 0
+
+def position_test():
+    t = reprows(getThe()['file'])
+    clustered = t.cluster()
+    
+    repplace(clustered)
+
+    return 0
+
+def every_test():
+    repgrid(getThe()['file'])
+
+    return 0
+
+def reservoir_test():
+    options = getThe()
+    options['Max'] = 32
+    setThe(options)
+
+    num1 = NUM()
+    for i in range(1, 10001):
+        num1.add(i)
+    oo(has(num1))
+
+    return 0
+
+def cliffs_test():
+    assert(False == cliffsDelta([8, 7, 6, 2, 5, 8, 7, 3], [8, 7, 6, 2, 5, 8, 7, 3]), '1')
+    assert(True == cliffsDelta([8, 7, 6, 2, 5, 8, 7, 3], [9, 9, 7, 8, 10, 9, 6]), '2')
+
+    t1, t2 = [], []
+    for i in range(1, 1001): t1.append(rand())
+    for i in range(1, 1001): t2.append(rand()**0.5)
+    
+    assert(False == cliffsDelta(t1, t1), '3')
+    assert(True == cliffsDelta(t1, t2), '4')
+
+    diff, j = False, 1.0
+    def fun(x):
+        return x*j, None
+    while not diff:
+        t3 = map(t1, fun)
+        diff = cliffsDelta(t1, t3)
+        print(">", rnd(j), diff)
+        j = j*1.025
+
+    return 0
+
+def dist_test():
+    data = DATA(getThe()['file'])
+    num = NUM()
+    for _, row in enumerate(data.rows):
+        num.add(data.dist(row, data.rows[0]))
+    oo({'lo': num.lo, 'hi': num.hi, 'mid': rnd(num.mid()), 'div': rnd(num.div())})
+
+    return 0
+

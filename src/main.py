@@ -4,9 +4,9 @@ import sys
 import os
 from strings import fmt, coerce
 from utils import getThe, setThe, setSeed, get_ofile, rint
-from test import settings_test, rand_test, sym_test, num_test, csv_test, data_test, stats_test, clone_test, around_test, half_test, cluster_test, optimize_test, copy_test, repcols_test, reprows_test, synonyms_test, prototypes_test
+from test import dist_test, cliffs_test, reservoir_test, settings_test, rand_test, sym_test, num_test, csv_test, data_test, stats_test, clone_test, around_test, half_test, cluster_test, optimize_test, copy_test, repcols_test, reprows_test, synonyms_test, prototypes_test, position_test, every_test
 
-help = 'script.lua : an example script with help text and a test suite\n (c)2022, Tim Menzies <timm@ieee.org>, BSD-2\n USAGE:   script.lua  [OPTIONS] [-g ACTION] \n OPTIONS: \n -d  --dump  on crash, dump stack = false \n -f  --file  name of file = etc/data/auto93.csv \n -F  --Far  distance to "faraway" = 0.95 \n -g  --go    start-up action      = data \n -h  --help  show help            = false \n -m  --min  stop clusters at N^min = 0.5 \n -p  --p  distance coefficient = 2 \n -s  --seed  random number seed   = 937162211 \n -S  --Sample  sampling data size = 512 \n ACTIONS:\n'
+help = 'script.lua : an example script with help text and a test suite\n (c)2022, Tim Menzies <timm@ieee.org>, BSD-2\n USAGE:   script.lua  [OPTIONS] [-g ACTION] \n OPTIONS: \n -R  --Reuse  child splits reuse a parent pole = true \n -r --rest  how many of rest to sample = 4 \n -M  --Max  numbers = 512 \n -m  --min  size of smallest cluster = 0.5 \n -H  --Halves  search space for clustering = 512 \n -F  --Far  distance to distant = 0.95 \n -c  --cliffs  cliff\'s delta threshold = 0.147 \n -b  --bins  initial number of bins = 16 \n -d  --dump  on crash, dump stack = false \n -f  --file  name of file = ../etc/data/auto93.csv \n -g  --go    start-up action      = data \n -h  --help  show help            = false \n -p  --p  distance coefficient = 2 \n -s  --seed  random number seed   = 937162211\n ACTIONS:\n'
 
 env_b4 = {}
 for env in os.environ:
@@ -51,21 +51,19 @@ def eg(key, str, fun):
 
 def main(options, help, funs):
     eg("the","show settings", settings_test)
-    # eg("rand","generate, reset, regenerate same", rand_test)
-    eg("sym","check syms", sym_test)
-    eg("num", "check nums", num_test)
-    # eg("csv", "read from csv", csv_test)
-    # eg("data", "read DATA csv", data_test)
-    # eg("clone", "duplicate structure", clone_test)
-    # eg("around", "sorting nearest neighbors", around_test)
-    # eg("half", "1-level bi-clustering", half_test)
-    # eg("cluster", "N-level bi-clustering", cluster_test)
-    # eg("optimize", "semi-supervised optimization", optimize_test)
-    
-    # eg('copy', 'check copy', copy_test)
-    # eg('repcols', 'checking repcols', repcols_test)
-    # eg('reprows', 'checking reprows', reprows_test)
-    eg('synonyms', 'checking repcols cluster', synonyms_test)
+
+    eg('rand', 'demo random number generation', rand_test)
+    eg('some', 'demo of reservoir sampling', reservoir_test)
+    eg('nums', 'demo of NUM', num_test)
+    eg('syms', 'demo SYMS', sym_test)
+    eg('csv', 'reading csv files', csv_test)
+    eg('data', 'showing data sets', data_test)
+    eg('clone', 'replicate structure of a DATA', clone_test)
+    eg('cliffs', 'stats tests', cliffs_test)
+    eg('dist', 'distance test', dist_test)
+    eg('half', 'divide data in half', half_test)
+    eg('tree', 'make and show tree of clusters', cluster_test)
+    eg('sway', 'optimizing', optimize_test)
 
     o_file = get_ofile()
     err = 0
@@ -79,6 +77,9 @@ def main(options, help, funs):
         print(help)
     else:
         for fun_key in funs:
+            options = cli(settings(help))
+            setThe(options)
+            
             if options['go'] == 'all' or fun_key == options['go']:
                 setSeed(options['seed'])
                 if funs[fun_key]() > 0:

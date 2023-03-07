@@ -1,11 +1,12 @@
 from abc import abstractmethod
 
-class VAL:
+class VAL():
     total = 0
 
     def __init__(self, n, s):
         self.col_pos = n
         self.col_name = s
+        self.has = []
 
     @abstractmethod
     def add(self, x):

@@ -1,5 +1,5 @@
 from VAL import VAL
-from utils import rnd
+from utils import getThe, rnd, per, has, rand, rint
 import math
 import re
 
@@ -8,8 +8,12 @@ class NUM(VAL):
         if len(args) > 0: 
             super().__init__(args[0], args[1])
             self.w = -1 if len(re.findall(r'-$', args[1])) > 0 else 1
+        elif len(args) == 0:
+            super().__init__(None, None)
+
         self.total, self.mu, self.m2 = 0, 0, 0
         self.lo, self.hi = math.inf, -math.inf
+        self.ok = True
 
     def add(self, x):
         if x != '?':
@@ -20,11 +24,20 @@ class NUM(VAL):
             self.lo = min(x, self.lo)
             self.hi = max(x, self.hi)
 
-    def mid(self):
-        return self.mu
+            pos = -1 if len(self.has) < getThe()['Max'] else rint(0, len(self.has)-1) if rand() < getThe()['Max']/self.total else None
+            if pos and pos >= 0:
+                self.has[pos] = x
+            elif pos == -1:
+                self.has.append(x)
+            else:
+                pass
+            self.ok = False
+
+    def mid(self, col=None):
+        return per(has(self), 0.5)
 
     def div(self):
-        return 0 if (self.m2 < 0 or self.total < 2) else (self.m2/(self.total-1))**0.5
+        return (per(has(self), 0.9) - per(has(self), 0.1)) / 2.56
 
     def rnd(self, x, n):
         return x if x=='?' else rnd(x, n)

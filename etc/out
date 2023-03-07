@@ -1,8 +1,50 @@
-{:Far 0.95 :Sample 512 :dump false :file etc/data/repgrid1 :go all :help false :min 0.5 :p 2 :seed 937162211}
+{:Far 0.95 :Halves 512 :Max 512 :Reuse true :bins 16 :cliffs 0.147 :dump false :file ../etc/data/auto93.csv :go all :help false :min 0.5 :p 2 :rest 4 :seed 937162211}
 ✅ pass: the
-✅ pass: sym
-✅ pass: num
-8 TargetedOnInterface:TargetedOnOverallSystem
-| 4 CommunicationTechnology:ApplicationTechnology
-| 4 DevelopmentTool:Application
-✅ pass: synonyms
+✅ pass: rand
+{1 15 687 1545 2022 2324 2758 2883 3247 3533 4067 4168 4469 4570 5863 5907 5957 6147 6440 6727 7228 7517 7574 7598 7765 7955 8311 8379 8538 9052 9189 9323}
+✅ pass: some
+✅ pass: nums
+✅ pass: syms
+✅ pass: csv
+{:Acc+ 15.5 :Lbs- 2807 :Mpg+ 20 :N 398}
+✅ pass: data
+{:Acc+ 15.5 :Lbs- 2807 :Mpg+ 20 :N 398}
+{:Acc+ 15.5 :Lbs- 2807 :Mpg+ 20 :N 398}
+✅ pass: clone
+✅ pass: cliffs
+{:div 0.26 :hi 0.8746495688429434 :lo 0.0 :mid 0.548}
+✅ pass: dist
+✅ pass: half
+[398]
+|.. [199]
+|.. |.. [99]
+|.. |.. |.. [49]
+|.. |.. |.. |.. [24]{:Acc+ 16 :Lbs- 2234 :Mpg+ 30 :N 24}
+|.. |.. |.. |.. [25]{:Acc+ 15.5 :Lbs- 2600 :Mpg+ 30 :N 25}
+|.. |.. |.. [50]
+|.. |.. |.. |.. [25]{:Acc+ 15.5 :Lbs- 2200 :Mpg+ 30 :N 25}
+|.. |.. |.. |.. [25]{:Acc+ 17.3 :Lbs- 2190 :Mpg+ 30 :N 25}
+|.. |.. [100]
+|.. |.. |.. [50]
+|.. |.. |.. |.. [25]{:Acc+ 15.5 :Lbs- 2290 :Mpg+ 30 :N 25}
+|.. |.. |.. |.. [25]{:Acc+ 16.4 :Lbs- 2300 :Mpg+ 30 :N 25}
+|.. |.. |.. [50]
+|.. |.. |.. |.. [25]{:Acc+ 16.4 :Lbs- 2585 :Mpg+ 30 :N 25}
+|.. |.. |.. |.. [25]{:Acc+ 17.3 :Lbs- 2019 :Mpg+ 30 :N 25}
+|.. [199]
+|.. |.. [99]
+|.. |.. |.. [49]
+|.. |.. |.. |.. [24]{:Acc+ 11.5 :Lbs- 4464 :Mpg+ 10 :N 24}
+|.. |.. |.. |.. [25]{:Acc+ 13.5 :Lbs- 4129 :Mpg+ 10 :N 25}
+|.. |.. |.. [50]
+|.. |.. |.. |.. [25]{:Acc+ 13.7 :Lbs- 4054 :Mpg+ 20 :N 25}
+|.. |.. |.. |.. [25]{:Acc+ 13 :Lbs- 4237 :Mpg+ 10 :N 25}
+|.. |.. [100]
+|.. |.. |.. [50]
+|.. |.. |.. |.. [25]{:Acc+ 17 :Lbs- 2639 :Mpg+ 20 :N 25}
+|.. |.. |.. |.. [25]{:Acc+ 16 :Lbs- 2904 :Mpg+ 20 :N 25}
+|.. |.. |.. [50]
+|.. |.. |.. |.. [25]{:Acc+ 16.4 :Lbs- 3380 :Mpg+ 20 :N 25}
+|.. |.. |.. |.. [25]{:Acc+ 17.7 :Lbs- 3459 :Mpg+ 20 :N 25}
+✅ pass: tree
+✅ pass: sway
