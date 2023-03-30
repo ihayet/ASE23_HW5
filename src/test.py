@@ -260,6 +260,7 @@ def cliffs_test():
         t3 = map(t1, fun)
         diff = cliffsDelta(t1, t3)
         print(">", rnd(j), diff)
+        get_ofile().write("> " + rnd(j) + ' ' + diff + '\n')
         j = j*1.025
 
     return 0
@@ -278,9 +279,12 @@ def bins_test():
     best, rest = data.sway()
 
     print('all\t', o({'best': len(best.rows), 'rest': len(rest.rows)}))
+    get_ofile().write('all\t' + o({'best': len(best.rows), 'rest': len(rest.rows)}) + '\n')
     for k, t in enumerate(bins(data.cols.xcols, {'best': best.rows, 'rest': rest.rows})):
         for single_range in t:
             print('{}\t{}\t{}\t{}\t{}'.format(single_range['txt'], single_range['lo'], single_range['hi'], rnd(value(single_range['y'].has, len(best.rows), len(rest.rows), 'best')), single_range['y'].has))
+            get_ofile().write('{}\t{}\t{}\t{}\t{}'.format(single_range['txt'], single_range['lo'], single_range['hi'], rnd(value(single_range['y'].has, len(best.rows), len(rest.rows), 'best')), single_range['y'].has) + '\n')
         print()
+        get_ofile().write('\n')
 
     return 0
