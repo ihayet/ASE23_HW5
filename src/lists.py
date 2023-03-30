@@ -2,23 +2,21 @@ from collections import OrderedDict
 from ROW import ROW
 
 def map(t, fun):
+    temp = {}
+    tempList = []
     if isinstance(t, dict):
-        temp = {}
         for k, v in t.items():
-            print(v)
             v, k = fun(v)
-            print(v, k)
-            
+                        
             if k is not None: temp[k] = v
-            else: temp.append(v)
+            else: tempList.append(v)
     elif isinstance(t, list):
-        temp = []
         for k, v in enumerate(t):
             v, k = fun(v)
             
-            if k is not None: temp[k] = v
-            else: temp.append(v)
-    return temp
+            if k is not None: tempList[k] = v
+            else: tempList.append(v)
+    return temp if temp else tempList
 
 def kap(t, fun):
     if isinstance(t, dict):

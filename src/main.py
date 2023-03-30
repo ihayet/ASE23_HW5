@@ -4,9 +4,9 @@ import sys
 import os
 from strings import fmt, coerce
 from utils import getThe, setThe, setSeed, get_ofile, rint
-from test import dist_test, cliffs_test, reservoir_test, settings_test, rand_test, sym_test, num_test, csv_test, data_test, stats_test, clone_test, around_test, half_test, cluster_test, optimize_test, copy_test, repcols_test, reprows_test, synonyms_test, prototypes_test, position_test, every_test
+from test import bins_test, dist_test, cliffs_test, reservoir_test, settings_test, rand_test, sym_test, num_test, csv_test, data_test, stats_test, clone_test, around_test, half_test, cluster_test, optimize_test, copy_test, repcols_test, reprows_test, synonyms_test, prototypes_test, position_test, every_test
 
-help = 'script.lua : an example script with help text and a test suite\n (c)2022, Tim Menzies <timm@ieee.org>, BSD-2\n USAGE:   script.lua  [OPTIONS] [-g ACTION] \n OPTIONS: \n -R  --Reuse  child splits reuse a parent pole = true \n -r --rest  how many of rest to sample = 4 \n -M  --Max  numbers = 512 \n -m  --min  size of smallest cluster = 0.5 \n -H  --Halves  search space for clustering = 512 \n -F  --Far  distance to distant = 0.95 \n -c  --cliffs  cliff\'s delta threshold = 0.147 \n -b  --bins  initial number of bins = 16 \n -d  --dump  on crash, dump stack = false \n -f  --file  name of file = ../etc/data/auto93.csv \n -g  --go    start-up action      = data \n -h  --help  show help            = false \n -p  --p  distance coefficient = 2 \n -s  --seed  random number seed   = 937162211\n ACTIONS:\n'
+help = 'script.lua : an example script with help text and a test suite\n (c)2022, Tim Menzies <timm@ieee.org>, BSD-2\n USAGE:   script.lua  [OPTIONS] [-g ACTION] \n OPTIONS: \n -R  --Reuse  child splits reuse a parent pole = True \n -r --rest  how many of rest to sample = 4 \n -M  --Max  numbers = 512 \n -m  --min  size of smallest cluster = 0.5 \n -H  --Halves  search space for clustering = 512 \n -F  --Far  distance to distant = 0.95 \n -c  --cliffs  cliff\'s delta threshold = 0.147 \n -b  --bins  initial number of bins = 16 \n -d  --dump  on crash, dump stack = false \n -f  --file  name of file = etc/data/auto93.csv \n -g  --go    start-up action      = data \n -h  --help  show help            = false \n -p  --p  distance coefficient = 2 \n -s  --seed  random number seed   = 937162211\n ACTIONS:\n'
 
 env_b4 = {}
 for env in os.environ:
@@ -64,6 +64,7 @@ def main(options, help, funs):
     eg('half', 'divide data in half', half_test)
     eg('tree', 'make and show tree of clusters', cluster_test)
     eg('sway', 'optimizing', optimize_test)
+    eg('bins', 'find deltas between best and rest', bins_test)
 
     o_file = get_ofile()
     err = 0

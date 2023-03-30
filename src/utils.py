@@ -36,7 +36,7 @@ def setThe(options):
 def get_ofile():
   global o_file
   if o_file is None:
-    o_file = open('../etc/out', 'w', encoding='utf-8')
+    o_file = open('etc/out', 'w', encoding='utf-8')
     
   return o_file
 
@@ -114,11 +114,16 @@ def diffs(nums1, nums2):
 
   return kap(nums1dict, fun)
 
-# def value(has, _nB=None, _nR=None, _sGoal=None):
-#   sGoal = _sGoal if _sGoal is not None else True
-#   nB = _nB if _nB is not None else 1
-#   nR = _nR if  _nR is not None else 1
-#   b, r = 0, 0
+def value(has, _nB=None, _nR=None, _sGoal=None):
+  sGoal = _sGoal if _sGoal is not None else True
+  nB = _nB if _nB is not None else 1
+  nR = _nR if  _nR is not None else 1
+  b, r = 0, 0
 
-#   for (i, n) in enumerate(has):
-#     if  x
+  if isinstance(has, dict):
+    for k, v in has.items():
+      if k==sGoal: b += v
+      else: r += v
+    
+    b, r = b/(nB+1+1e-32), r/(nR+1+1e-32)
+    return b**2/(b+r)

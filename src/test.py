@@ -3,10 +3,11 @@ from SYM import SYM
 from NUM import NUM
 from strings import o, oo, show
 from lists import map
-from utils import getThe, setThe, cliffsDelta, diffs, rand, rint, rnd, setSeed, get_ofile, copy, last, has
+from utils import getThe, setThe, cliffsDelta, diffs, rand, rint, rnd, setSeed, get_ofile, copy, last, has, value
 from repgrid import repcols, reprows, repplace, repgrid
 from csv import csv
 from DATA import DATA
+from bins import bins
 
 def settings_test():
     err = 0
@@ -272,3 +273,14 @@ def dist_test():
 
     return 0
 
+def bins_test():
+    data = DATA(getThe()['file'])
+    best, rest = data.sway()
+
+    print('all\t', o({'best': len(best.rows), 'rest': len(rest.rows)}))
+    for k, t in enumerate(bins(data.cols.xcols, {'best': best.rows, 'rest': rest.rows})):
+        for single_range in t:
+            print('{}\t{}\t{}\t{}\t{}'.format(single_range['txt'], single_range['lo'], single_range['hi'], rnd(value(single_range['y'].has, len(best.rows), len(rest.rows), 'best')), single_range['y'].has))
+        print()
+
+    return 0

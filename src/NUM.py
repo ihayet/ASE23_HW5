@@ -18,6 +18,7 @@ class NUM(VAL):
     def add(self, x):
         if x != '?':
             self.total += 1
+
             temp = x - self.mu
             self.mu += temp/self.total
             self.m2 += temp*(x - self.mu)

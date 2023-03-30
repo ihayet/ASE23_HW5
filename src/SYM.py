@@ -9,8 +9,9 @@ class SYM(VAL):
             super().__init__(None, None)
         self.total, self.most, self.mode = 0, 0, None
         self.sym_counter = {}
+        self.has = self.sym_counter
 
-    def add(self, x):
+    def add(self, x):        
         if x != "?":
             self.total += 1
 
